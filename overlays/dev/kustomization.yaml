@@ -43,3 +43,17 @@ patches:
       - op: replace
         path: /spec/replicas
         value: 1
+
+  # Configure Control Center for single-broker mode
+  - target:
+      kind: ControlCenter
+      name: controlcenter
+    patch: |-
+      - op: add
+        path: /spec/configOverrides
+        value:
+          server:
+            - confluent.controlcenter.internal.topics.replication=1
+            - confluent.controlcenter.command.topic.replication=1
+            - confluent.monitoring.interceptor.topic.replication=1
+            - confluent.metrics.topic.replication=1
