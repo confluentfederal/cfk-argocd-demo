@@ -1,0 +1,118 @@
+---
+# Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: confluent
+---
+# Zookeeper Cluster
+apiVersion: platform.confluent.io/v1beta1
+kind: Zookeeper
+metadata:
+  name: zookeeper
+  namespace: confluent
+spec:
+  replicas: 3
+  image:
+    application: confluentinc/cp-zookeeper:8.1.1
+    init: confluentinc/confluent-init-container:3.1.1
+  dataVolumeCapacity: 10Gi
+  logVolumeCapacity: 10Gi
+---
+# Kafka Cluster
+apiVersion: platform.confluent.io/v1beta1
+kind: Kafka
+metadata:
+  name: kafka
+  namespace: confluent
+spec:
+  replicas: 3
+  image:
+    application: confluentinc/cp-server:8.1.1
+    init: confluentinc/confluent-init-container:3.1.1
+  dataVolumeCapacity: 10Gi
+  metricReporter:
+    enabled: true
+---
+# Schema Registry
+apiVersion: platform.confluent.io/v1beta1
+kind: SchemaRegistry
+metadata:
+  name: schemaregistry
+  namespace: confluent
+spec:
+  replicas: 1
+  image:
+    application: confluentinc/cp-schema-registry:8.1.1
+    init: confluentinc/confluent-init-container:3.1.1
+---
+# Kafka Connect Cluster
+apiVersion: platform.confluent.io/v1beta1
+kind: Connect
+metadata:
+  name: connect
+  namespace: confluent
+spec:
+  replicas: 2
+  image:
+    application: confluentinc/cp-server-connect:8.1.1
+    init: confluentinc/confluent-init-container:3.1.1
+  dependencies:
+    kafka:
+      bootstrapEndpoint: kafka:9071
+    schemaRegistry:
+      url: http://schemaregistry.confluent.svc.cluster.local:8081
+  build:
+    type: onDemand
+    onDemand:
+      plugins:
+        locationType: confluentHub
+        confluentHub:
+          - name: kafka-connect-datagen
+            owner: confluentinc
+            version: "0.6.5"
+          - name: kafka-connect-jdbc
+            owner: confluentinc
+            version: "10.8.0"
+---
+# ksqlDB Cluster
+apiVersion: platform.confluent.io/v1beta1
+kind: KsqlDB
+metadata:
+  name: ksqldb
+  namespace: confluent
+spec:
+  replicas: 1
+  image:
+    application: confluentinc/cp-ksqldb-server:8.1.1
+    init: confluentinc/confluent-init-container:3.1.1
+  dataVolumeCapacity: 10Gi
+  dependencies:
+    kafka:
+      bootstrapEndpoint: kafka:9071
+    schemaRegistry:
+      url: http://schemaregistry.confluent.svc.cluster.local:8081
+---
+# Control Center
+apiVersion: platform.confluent.io/v1beta1
+kind: ControlCenter
+metadata:
+  name: controlcenter
+  namespace: confluent
+spec:
+  replicas: 1
+  image:
+    application: confluentinc/cp-enterprise-control-center:8.1.1
+    init: confluentinc/confluent-init-container:3.1.1
+  dataVolumeCapacity: 10Gi
+  dependencies:
+    kafka:
+      bootstrapEndpoint: kafka:9071
+    schemaRegistry:
+      url: http://schemaregistry.confluent.svc.cluster.local:8081
+    ksqldb:
+      - name: ksqldb
+        url: http://ksqldb.confluent.svc.cluster.local:8088
+    connect:
+      - name: connect
+        url: http://connect.confluent.svc.cluster.local:8083

@@ -1,0 +1,101 @@
+---
+# ksqlDB Queries as ConfigMap
+# These can be applied to ksqlDB via init scripts or REST API
+# For GitOps, we store the queries declaratively and apply on deployment
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ksqldb-queries
+  namespace: confluent
+data:
+  # Stream from pageviews topic
+  01-create-pageviews-stream.sql: |
+    CREATE STREAM pageviews_stream (
+      viewtime BIGINT,
+      userid VARCHAR,
+      pageid VARCHAR
+    ) WITH (
+      KAFKA_TOPIC='pageviews',
+      VALUE_FORMAT='AVRO'
+    );
+  
+  # Stream from users topic
+  02-create-users-table.sql: |
+    CREATE TABLE users_table (
+      userid VARCHAR PRIMARY KEY,
+      registertime BIGINT,
+      gender VARCHAR,
+      regionid VARCHAR
+    ) WITH (
+      KAFKA_TOPIC='users',
+      VALUE_FORMAT='AVRO'
+    );
+  
+  # Join pageviews with users
+  03-create-enriched-pageviews.sql: |
+    CREATE STREAM enriched_pageviews AS
+    SELECT 
+      pv.viewtime,
+      pv.userid,
+      pv.pageid,
+      u.gender,
+      u.regionid
+    FROM pageviews_stream pv
+    LEFT JOIN users_table u ON pv.userid = u.userid
+    EMIT CHANGES;
+  
+  # Aggregate pageviews by region
+  04-pageviews-by-region.sql: |
+    CREATE TABLE pageviews_by_region AS
+    SELECT 
+      regionid,
+      COUNT(*) AS view_count
+    FROM enriched_pageviews
+    GROUP BY regionid
+    EMIT CHANGES;
+---
+# Job to apply ksqlDB queries on startup
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ksqldb-query-init
+  namespace: confluent
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: ksqldb-init
+          image: curlimages/curl:latest
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for ksqlDB to be ready..."
+              until curl -s http://ksqldb.confluent.svc.cluster.local:8088/info > /dev/null 2>&1; do
+                echo "ksqlDB not ready, waiting..."
+                sleep 10
+              done
+              echo "ksqlDB is ready, applying queries..."
+              
+              # Apply each query file
+              for query_file in /queries/*.sql; do
+                echo "Applying $query_file..."
+                query=$(cat "$query_file")
+                curl -X POST http://ksqldb.confluent.svc.cluster.local:8088/ksql \
+                  -H "Content-Type: application/vnd.ksql.v1+json" \
+                  -d "{\"ksql\": \"$query\", \"streamsProperties\": {}}" || true
+                sleep 2
+              done
+              echo "All queries applied!"
+          volumeMounts:
+            - name: queries
+              mountPath: /queries
+      volumes:
+        - name: queries
+          configMap:
+            name: ksqldb-queries

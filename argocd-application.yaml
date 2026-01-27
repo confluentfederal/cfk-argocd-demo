@@ -1,0 +1,63 @@
+---
+# Argo CD Application for Confluent Platform GitOps Demo
+# Apply this to your cluster to enable GitOps management
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: confluent-platform
+  namespace: argocd
+spec:
+  project: default
+  
+  source:
+    # Update this to your Git repository URL
+    repoURL: https://github.com/YOUR-ORG/cfk-argocd-demo.git
+    targetRevision: HEAD
+    path: overlays/dev  # Use overlays/prod for production
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: confluent
+  
+  syncPolicy:
+    automated:
+      prune: true        # Delete resources when removed from Git
+      selfHeal: true     # Revert manual changes to match Git
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+
+---
+# Optional: Argo CD AppProject for Confluent workloads
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: confluent
+  namespace: argocd
+spec:
+  description: Confluent Platform GitOps project
+  
+  sourceRepos:
+    - '*'
+  
+  destinations:
+    - namespace: confluent
+      server: https://kubernetes.default.svc
+    - namespace: confluent-operator
+      server: https://kubernetes.default.svc
+  
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+    - group: platform.confluent.io
+      kind: '*'
+  
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'

@@ -1,0 +1,69 @@
+---
+# Flink Environment - Managed by CMF (Confluent Manager for Flink)
+# Note: Requires CMF operator to be installed separately
+# See: https://docs.confluent.io/operator/current/co-manage-flink.html
+apiVersion: platform.confluent.io/v1beta1
+kind: FlinkEnvironment
+metadata:
+  name: flink-env
+  namespace: confluent
+spec:
+  # Flink environment configuration
+  image:
+    application: confluentinc/cp-flink:1.19-cp1
+    init: confluentinc/confluent-init-container:3.1.1
+  replicas: 1
+  dependencies:
+    kafka:
+      bootstrapEndpoint: kafka:9071
+    schemaRegistry:
+      url: http://schemaregistry.confluent.svc.cluster.local:8081
+---
+# Sample Flink Application
+apiVersion: platform.confluent.io/v1beta1
+kind: FlinkApplication
+metadata:
+  name: pageview-aggregator
+  namespace: confluent
+spec:
+  flinkEnvironmentRef:
+    name: flink-env
+  flinkConfiguration:
+    taskmanager.numberOfTaskSlots: "2"
+    parallelism.default: "2"
+  # SQL to run - aggregates pageviews by user
+  sql: |
+    CREATE TABLE pageviews (
+      viewtime BIGINT,
+      userid STRING,
+      pageid STRING
+    ) WITH (
+      'connector' = 'kafka',
+      'topic' = 'pageviews',
+      'properties.bootstrap.servers' = 'kafka:9092',
+      'format' = 'avro-confluent',
+      'avro-confluent.url' = 'http://schemaregistry:8081'
+    );
+    
+    CREATE TABLE pageview_counts (
+      userid STRING,
+      view_count BIGINT,
+      window_start TIMESTAMP(3),
+      window_end TIMESTAMP(3),
+      PRIMARY KEY (userid) NOT ENFORCED
+    ) WITH (
+      'connector' = 'kafka',
+      'topic' = 'pageview-counts',
+      'properties.bootstrap.servers' = 'kafka:9092',
+      'format' = 'avro-confluent',
+      'avro-confluent.url' = 'http://schemaregistry:8081'
+    );
+    
+    INSERT INTO pageview_counts
+    SELECT 
+      userid,
+      COUNT(*) as view_count,
+      TUMBLE_START(TO_TIMESTAMP_LTZ(viewtime, 3), INTERVAL '1' MINUTE) as window_start,
+      TUMBLE_END(TO_TIMESTAMP_LTZ(viewtime, 3), INTERVAL '1' MINUTE) as window_end
+    FROM pageviews
+    GROUP BY userid, TUMBLE(TO_TIMESTAMP_LTZ(viewtime, 3), INTERVAL '1' MINUTE);

@@ -1,0 +1,70 @@
+---
+# Sample Kafka Streams Application Deployment
+# This represents a custom Kafka Streams application managed via GitOps
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pageview-enricher
+  namespace: confluent
+  labels:
+    app: pageview-enricher
+    component: kstreams
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pageview-enricher
+  template:
+    metadata:
+      labels:
+        app: pageview-enricher
+        component: kstreams
+    spec:
+      containers:
+        - name: pageview-enricher
+          # Replace with your actual Kafka Streams application image
+          image: confluentinc/cp-kafka:8.1.1
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Placeholder for Kafka Streams application"
+              echo "In production, this would run your KStreams JAR"
+              echo "Example: java -jar /app/kstreams-app.jar"
+              # Keep container running for demo purposes
+              tail -f /dev/null
+          env:
+            - name: BOOTSTRAP_SERVERS
+              value: kafka:9092
+            - name: SCHEMA_REGISTRY_URL
+              value: http://schemaregistry:8081
+            - name: APPLICATION_ID
+              value: pageview-enricher-v1
+            - name: INPUT_TOPIC
+              value: pageviews
+            - name: OUTPUT_TOPIC
+              value: enriched-pageviews
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+---
+# ConfigMap for Kafka Streams configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kstreams-config
+  namespace: confluent
+data:
+  streams.properties: |
+    application.id=pageview-enricher-v1
+    bootstrap.servers=kafka:9092
+    schema.registry.url=http://schemaregistry:8081
+    default.key.serde=org.apache.kafka.common.serialization.Serdes$StringSerde
+    default.value.serde=io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
+    num.stream.threads=2
+    commit.interval.ms=1000
+    cache.max.bytes.buffering=10485760

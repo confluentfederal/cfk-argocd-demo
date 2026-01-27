@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  # Core Confluent Platform components
+  - confluent-platform.yaml
+  
+  # Kafka Connect connectors (declarative)
+  - connectors.yaml
+  
+  # ksqlDB queries (declarative)
+  - ksqldb-queries.yaml
+  
+  # Kafka Streams applications
+  - kstreams-app.yaml
+  
+  # Flink environment and applications
+  # Note: Uncomment when CMF operator is installed
+  # - flink.yaml
+
+commonLabels:
+  app.kubernetes.io/managed-by: argocd
+  app.kubernetes.io/part-of: confluent-platform
