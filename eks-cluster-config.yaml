@@ -2,7 +2,7 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: cfk-demo
+  name: cfk-argocd-demo
   region: us-east-1
   version: "1.31"
 
