@@ -114,8 +114,8 @@ spec:
   externalAccess:
     type: loadBalancer
     loadBalancer:
-      domain: ""
-      port: 9021
+      domain: confluent.local
+      prefix: controlcenter
   dependencies:
     kafka:
       bootstrapEndpoint: kafka:9071
