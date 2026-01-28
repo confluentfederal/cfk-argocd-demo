@@ -114,8 +114,8 @@ spec:
   externalAccess:
     type: nodePort
     nodePort:
-      host: ec2-54-81-248-214.compute-1.amazonaws.com
-      nodePortOffset: 30900
+      host: 54.81.248.214
+      nodePortOffset: 30021
   dependencies:
     kafka:
       bootstrapEndpoint: kafka:9071
