@@ -8,7 +8,7 @@ metadata:
   namespace: confluent
 spec:
   cmfRest:
-    endpoint: http://cmf:80
+    endpoint: http://cmf-service:80
 ---
 # Flink Environment - Default configuration for Flink applications
 apiVersion: platform.confluent.io/v1beta1
