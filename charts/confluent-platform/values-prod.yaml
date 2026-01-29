@@ -29,7 +29,7 @@ controlCenter:
     enabled: true
     type: nodePort
     nodePort:
-      host: ""  # Set to your node's external IP
+      host: "54.81.248.214"
       nodePortOffset: 30021
 
 # Kafka Streams - 3 replicas for HA
