@@ -116,6 +116,11 @@ spec:
     nodePort:
       host: 54.81.248.214
       nodePortOffset: 30021
+  configOverrides:
+    server:
+      # Enable Confluent Manager for Flink (CMF) integration
+      - confluent.controlcenter.cmf.enable=true
+      - confluent.controlcenter.cmf.url=http://cmf-service.confluent.svc.cluster.local:80
   dependencies:
     kafka:
       bootstrapEndpoint: kafka:9071
