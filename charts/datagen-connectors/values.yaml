@@ -1,0 +1,57 @@
+# DataGen Connectors
+# Demo connectors for generating sample data
+
+# Target namespace (should match where Connect is deployed)
+namespace: confluent
+
+# Connect cluster reference
+connectClusterRef: connect
+
+# Schema Registry URL
+schemaRegistryUrl: http://schemaregistry.confluent.svc.cluster.local:8081
+
+# Connectors to deploy
+connectors:
+  - name: datagen-users
+    enabled: true
+    class: io.confluent.kafka.connect.datagen.DatagenConnector
+    taskMax: 1
+    topic: users
+    quickstart: users
+    keyConverter: org.apache.kafka.connect.storage.StringConverter
+    valueConverter: io.confluent.connect.avro.AvroConverter
+    maxInterval: "1000"
+    iterations: "10000000"
+
+  - name: datagen-pageviews
+    enabled: true
+    class: io.confluent.kafka.connect.datagen.DatagenConnector
+    taskMax: 1
+    topic: pageviews
+    quickstart: pageviews
+    keyConverter: org.apache.kafka.connect.storage.StringConverter
+    valueConverter: io.confluent.connect.avro.AvroConverter
+    maxInterval: "500"
+    iterations: "10000000"
+
+  - name: datagen-orders
+    enabled: true
+    class: io.confluent.kafka.connect.datagen.DatagenConnector
+    taskMax: 1
+    topic: orders
+    quickstart: orders
+    keyConverter: org.apache.kafka.connect.storage.StringConverter
+    valueConverter: io.confluent.connect.avro.AvroConverter
+    maxInterval: "2000"
+    iterations: "10000000"
+
+  - name: datagen-stock-trades
+    enabled: true
+    class: io.confluent.kafka.connect.datagen.DatagenConnector
+    taskMax: 1
+    topic: stock-trades
+    quickstart: stock_trades
+    keyConverter: org.apache.kafka.connect.storage.StringConverter
+    valueConverter: io.confluent.connect.avro.AvroConverter
+    maxInterval: "100"
+    iterations: "10000000"

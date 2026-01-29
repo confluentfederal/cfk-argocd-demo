@@ -1,0 +1,16 @@
+apiVersion: v2
+name: datagen-connectors
+description: DataGen connectors for demo/testing purposes
+type: application
+version: 1.0.0
+appVersion: "0.6.5"
+
+keywords:
+  - kafka
+  - connect
+  - datagen
+  - demo
+
+maintainers:
+  - name: Confluent Federal
+    email: cstevenson@confluent.io

@@ -1,0 +1,37 @@
+---
+# Argo CD Application for DataGen Connectors - Production
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: datagen-connectors-prod
+  namespace: argocd
+  labels:
+    environment: prod
+    component: connectors
+spec:
+  project: confluent
+  
+  source:
+    repoURL: https://github.com/confluentfederal/cfk-argocd-demo.git
+    targetRevision: helm-migration  # Change to main after merge
+    path: charts/datagen-connectors
+    helm:
+      valueFiles:
+        - values.yaml
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: confluent
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false  # Namespace created by platform chart
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

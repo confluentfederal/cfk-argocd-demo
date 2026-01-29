@@ -1,0 +1,93 @@
+# Content Router - Kafka Streams content-based routing application
+
+# Target namespace
+namespace: confluent
+
+# Deployment settings
+replicas: 1
+
+image:
+  repository: registry.troxlie.com/confluentps/kstream-content-router
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+# - name: registry-credentials
+
+# Kafka connection
+kafka:
+  bootstrapServers: kafka:9071
+
+# Schema Registry connection
+schemaRegistry:
+  url: http://schemaregistry.confluent.svc.cluster.local:8081
+
+# Topics
+inputTopics:
+  - input-topic
+outputTopic: default-output
+errorTopic: error-topic
+
+# Routing configuration
+routing:
+  inputTopicFormat: AVRO  # AVRO, JSON, JSON_NOSCHEMA, STRING
+  inputMessageField: rawMessage
+  defaultOutputTopic: unmatched-messages
+  removeControlCharacters: true
+  rules: []
+  # Example rules:
+  # - regEx: ".*ERROR.*"
+  #   outputTopic: error-messages
+  # - substring: "WARN"
+  #   outputTopic: warning-messages
+
+# Additional Kafka Streams configuration passed via --streams-config
+streamsConfig: {}
+# Example for TLS:
+#   "security.protocol": "SSL"
+#   "ssl.truststore.type": "PEM"
+#   "ssl.truststore.certificates": "${TRUSTSTORE_CERTS}"
+
+# TLS configuration
+tls:
+  enabled: false
+  secretName: ""  # Name of K8s secret containing TLS certs
+  mountPath: /etc/content-router-tls
+
+# Environment variables
+extraEnv: []
+# - name: MY_VAR
+#   value: "my-value"
+# - name: SECRET_VAR
+#   valueFrom:
+#     secretKeyRef:
+#       name: my-secret
+#       key: password
+
+# Additional volume mounts
+extraVolumeMounts: []
+extraVolumes: []
+
+# Resources
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1Gi"
+    cpu: "500m"
+
+# Probes
+livenessProbe: {}
+#   httpGet:
+#     path: /actuator/health
+#     port: 8080
+#   initialDelaySeconds: 30
+#   periodSeconds: 10
+
+readinessProbe: {}
+#   httpGet:
+#     path: /actuator/health
+#     port: 8080
+#   initialDelaySeconds: 10
+#   periodSeconds: 5

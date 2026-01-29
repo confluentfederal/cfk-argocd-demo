@@ -1,0 +1,43 @@
+---
+# Argo CD Application for Content Router - Production
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: content-router-prod
+  namespace: argocd
+  labels:
+    environment: prod
+    component: kstreams
+spec:
+  project: confluent
+  
+  source:
+    repoURL: https://github.com/confluentfederal/cfk-argocd-demo.git
+    targetRevision: helm-migration  # Change to main after merge
+    path: charts/content-router
+    helm:
+      valueFiles:
+        - values.yaml
+      # Override values for production:
+      # parameters:
+      #   - name: replicas
+      #     value: "2"
+      #   - name: image.tag
+      #     value: "1.0.0"
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: confluent
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false  # Namespace created by platform chart
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

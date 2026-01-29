@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: content-router-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "content-router.labels" . | nindent 4 }}
+data:
+  application.yml: |
+    routing:
+      inputTopicFormat: {{ .Values.routing.inputTopicFormat }}
+      inputMessageField: {{ .Values.routing.inputMessageField }}
+      {{- if .Values.routing.defaultOutputTopic }}
+      defaultOutputTopic: {{ .Values.routing.defaultOutputTopic }}
+      {{- end }}
+      {{- if .Values.routing.removeControlCharacters }}
+      removeControlCharacters: {{ .Values.routing.removeControlCharacters }}
+      {{- end }}
+      rules:
+        {{- range .Values.routing.rules }}
+        - {{- if .regEx }}
+          regEx: {{ .regEx | quote }}
+          {{- end }}
+          {{- if .substring }}
+          substring: {{ .substring | quote }}
+          {{- end }}
+          outputTopic: {{ .outputTopic }}
+        {{- end }}

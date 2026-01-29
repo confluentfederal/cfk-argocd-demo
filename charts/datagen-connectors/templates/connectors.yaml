@@ -1,0 +1,34 @@
+{{- range .Values.connectors }}
+{{- if .enabled }}
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: Connector
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Values.namespace }}
+  labels:
+    {{- include "datagen-connectors.labels" $ | nindent 4 }}
+spec:
+  class: {{ .class }}
+  taskMax: {{ .taskMax | default 1 }}
+  connectClusterRef:
+    name: {{ $.Values.connectClusterRef }}
+  configs:
+    kafka.topic: {{ .topic }}
+    {{- if .quickstart }}
+    quickstart: {{ .quickstart }}
+    {{- end }}
+    key.converter: {{ .keyConverter | default "org.apache.kafka.connect.storage.StringConverter" }}
+    value.converter: {{ .valueConverter | default "io.confluent.connect.avro.AvroConverter" }}
+    value.converter.schema.registry.url: {{ $.Values.schemaRegistryUrl }}
+    {{- if .maxInterval }}
+    max.interval: {{ .maxInterval | quote }}
+    {{- end }}
+    {{- if .iterations }}
+    iterations: {{ .iterations | quote }}
+    {{- end }}
+    {{- range $key, $value := .extraConfigs }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+{{- end }}
+{{- end }}

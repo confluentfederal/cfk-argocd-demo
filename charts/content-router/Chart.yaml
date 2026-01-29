@@ -1,0 +1,16 @@
+apiVersion: v2
+name: content-router
+description: Kafka Streams content-based routing application
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+keywords:
+  - kafka
+  - kafka-streams
+  - routing
+  - content-router
+
+maintainers:
+  - name: Confluent Federal
+    email: cstevenson@confluent.io

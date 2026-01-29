@@ -129,38 +129,10 @@ controlCenter:
   configOverrides:
     server: []
 
-# Connectors
+# Connectors - Disabled in platform chart, managed separately
 connectors:
-  enabled: true
-  items:
-    - name: datagen-users
-      class: io.confluent.kafka.connect.datagen.DatagenConnector
-      taskMax: 1
-      topic: users
-      quickstart: users
-      maxInterval: "1000"
-      iterations: "10000000"
-    - name: datagen-pageviews
-      class: io.confluent.kafka.connect.datagen.DatagenConnector
-      taskMax: 1
-      topic: pageviews
-      quickstart: pageviews
-      maxInterval: "500"
-      iterations: "10000000"
-    - name: datagen-orders
-      class: io.confluent.kafka.connect.datagen.DatagenConnector
-      taskMax: 1
-      topic: orders
-      quickstart: orders
-      maxInterval: "2000"
-      iterations: "10000000"
-    - name: datagen-stock-trades
-      class: io.confluent.kafka.connect.datagen.DatagenConnector
-      taskMax: 1
-      topic: stock-trades
-      quickstart: stock_trades
-      maxInterval: "100"
-      iterations: "10000000"
+  enabled: false
+  items: []
 
 # Kafka Streams Demo App
 kstreamsApp:
@@ -210,81 +182,5 @@ flink:
         parallelism: 2
         upgradeMode: stateless
 
-# Content Router (Kafka Streams content-based routing application)
-contentRouter:
-  enabled: false  # Enable when ready to deploy
-  replicas: 1
-  image:
-    repository: registry.troxlie.com/confluentps/kstream-content-router
-    tag: latest
-    pullPolicy: IfNotPresent
-  imagePullSecrets: []
-  
-  # Kafka connection
-  kafka:
-    bootstrapServers: kafka:9071
-  
-  # Schema Registry connection
-  schemaRegistry:
-    url: http://schemaregistry.confluent.svc.cluster.local:8081
-  
-  # Topics
-  inputTopics:
-    - input-topic
-  outputTopic: default-output
-  errorTopic: error-topic
-  
-  # Routing configuration
-  routing:
-    inputTopicFormat: AVRO  # AVRO, JSON, JSON_NOSCHEMA, STRING
-    inputMessageField: rawMessage
-    defaultOutputTopic: unmatched-messages
-    removeControlCharacters: true
-    rules: []
-    # Example rules:
-    # - regEx: ".*ERROR.*"
-    #   outputTopic: error-messages
-    # - substring: "WARN"
-    #   outputTopic: warning-messages
-  
-  # Additional Kafka Streams configuration
-  streamsConfig: {}
-  # Example:
-  # streamsConfig:
-  #   "security.protocol": "SSL"
-  #   "ssl.truststore.type": "PEM"
-  
-  # TLS configuration
-  tls:
-    enabled: false
-    secretName: ""  # Name of secret containing TLS certs
-  
-  # Environment variables
-  extraEnv: []
-  
-  # Additional volume mounts
-  extraVolumeMounts: []
-  extraVolumes: []
-  
-  # Resources
-  resources:
-    requests:
-      memory: "512Mi"
-      cpu: "250m"
-    limits:
-      memory: "1Gi"
-      cpu: "500m"
-  
-  # Probes (uncomment to enable)
-  # livenessProbe:
-  #   httpGet:
-  #     path: /actuator/health
-  #     port: 8080
-  #   initialDelaySeconds: 30
-  #   periodSeconds: 10
-  # readinessProbe:
-  #   httpGet:
-  #     path: /actuator/health
-  #     port: 8080
-  #   initialDelaySeconds: 10
-  #   periodSeconds: 5
+# Content Router - Managed as separate chart
+# See charts/content-router/
