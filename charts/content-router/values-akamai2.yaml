@@ -1,0 +1,69 @@
+# Content Router - Akamai routing instance
+# Routes Akamai CDN/security logs based on event type
+
+# Target namespace
+namespace: confluent
+
+# Deployment settings
+replicas: 2
+
+image:
+  repository: cstevenson954/kstream-content-router
+  tag: "1.1.1"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+# Kafka connection
+kafka:
+  bootstrapServers: kafka:9071
+
+# Schema Registry connection
+schemaRegistry:
+  url: http://schemaregistry.confluent.svc.cluster.local:8081
+
+# Topics
+inputTopics:
+  - akamai-raw
+outputTopic: akamai-newish
+errorTopic: akamai-newish-errors
+
+# Routing configuration
+routing:
+  inputTopicFormat: STRING
+  inputMessageField: rawMessage
+  defaultOutputTopic: akamai-other
+  removeControlCharacters: true
+  rules:
+    - regEx: ".*\"type\"\\s*:\\s*\"(WAF|FIREWALL)\".*"
+      outputTopic: akamai-security
+
+
+# Additional Kafka Streams configuration
+streamsConfig: {}
+
+# TLS configuration
+tls:
+  enabled: false
+  secretName: ""
+  mountPath: /etc/content-router-tls
+
+# Environment variables
+extraEnv: []
+
+# Additional volume mounts
+extraVolumeMounts: []
+extraVolumes: []
+
+# Resources
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1Gi"
+    cpu: "500m"
+
+# Probes
+livenessProbe: {}
+readinessProbe: {}
