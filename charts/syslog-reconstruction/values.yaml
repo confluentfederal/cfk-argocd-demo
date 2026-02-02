@@ -13,11 +13,11 @@ javaOpts: "-Xms512m -Xmx1g"
 
 resources:
   requests:
+    memory: "512Mi"
+    cpu: "100m"
+  limits:
     memory: "1Gi"
     cpu: "500m"
-  limits:
-    memory: "2Gi"
-    cpu: "1"
 
 kafka:
   applicationId: segment-reconstruction
