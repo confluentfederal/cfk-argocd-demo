@@ -207,6 +207,22 @@ ksqldb:
 3. Commit and push
 4. Apply: `kubectl apply -f argocd/applications/flink-myjob.yaml`
 
+### 6. Switch an Application to a Different Branch
+
+```bash
+# Switch to develop branch
+kubectl patch application confluent-platform-prod -n argocd \
+  --type merge -p '{"spec":{"source":{"targetRevision":"develop"}}}'
+
+# Switch back to main
+kubectl patch application confluent-platform-prod -n argocd \
+  --type merge -p '{"spec":{"source":{"targetRevision":"main"}}}'
+
+# Check current branch
+kubectl get application confluent-platform-prod -n argocd \
+  -o jsonpath='{.spec.source.targetRevision}'
+```
+
 ## Environment Configuration
 
 | Setting | Dev | Prod |
