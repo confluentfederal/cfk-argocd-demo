@@ -192,11 +192,11 @@ flink:
       jobManager:
         resource:
           memory: "1024m"
-          cpu: 0.5
+          cpu: "0.5"
       taskManager:
         resource:
           memory: "1024m"
-          cpu: 0.5
+          cpu: "0.5"
       job:
         jarURI: local:///opt/flink/usrlib/java-flink-0.0.1.jar
         entryClass: com.example.javaflink.StreamingJob
