@@ -1,0 +1,39 @@
+---
+# Argo CD Application for Hostname Enrichment Flink Job
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: flink-hostname-enrichment
+  namespace: argocd
+  labels:
+    environment: prod
+    component: flink
+    use-case: data-enrichment
+spec:
+  project: confluent
+  
+  source:
+    repoURL: https://github.com/confluentfederal/cfk-argocd-demo.git
+    targetRevision: helm-migration
+    path: charts/flink-application
+    helm:
+      releaseName: hostname-enrichment
+      valueFiles:
+        - values-hostname-enrichment.yaml
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: confluent
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
