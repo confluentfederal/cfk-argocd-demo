@@ -182,26 +182,7 @@ flink:
         parallelism: 2
         upgradeMode: stateless
     
-    - name: top-speed-windowing
-      image: confluentinc/cp-flink-sql:1.19-cp1
-      flinkVersion: v1_19
-      flinkConfiguration:
-        taskmanager.numberOfTaskSlots: "2"
-      serviceAccount: flink
-      jobManager:
-        resource:
-          memory: "1200m"
-          cpu: 1
-      taskManager:
-        resource:
-          memory: "1200m"
-          cpu: 1
-      job:
-        jarURI: local:///opt/flink/examples/streaming/TopSpeedWindowing.jar
-        state: running
-        parallelism: 2
-        upgradeMode: stateless
-    
+    # Custom Kafka streaming job
     - name: kafka-streaming-job
       image: cstevenson954/java-flink:0.0.1
       flinkVersion: v1_20
@@ -210,16 +191,16 @@ flink:
       serviceAccount: flink
       jobManager:
         resource:
-          memory: "1500m"
-          cpu: 1
+          memory: "1024m"
+          cpu: 0.5
       taskManager:
         resource:
-          memory: "1500m"
-          cpu: 1
+          memory: "1024m"
+          cpu: 0.5
       job:
         jarURI: local:///opt/flink/usrlib/java-flink-0.0.1.jar
         state: running
-        parallelism: 2
+        parallelism: 1
         upgradeMode: stateless
         args:
           - "--bootstrap.servers=kafka.confluent.svc.cluster.local:9071"
