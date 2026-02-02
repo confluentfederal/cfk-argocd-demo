@@ -20,7 +20,9 @@ spec:
     {{- end }}
     key.converter: {{ .keyConverter | default "org.apache.kafka.connect.storage.StringConverter" }}
     value.converter: {{ .valueConverter | default "io.confluent.connect.avro.AvroConverter" }}
+    {{- if not .skipSchemaRegistry }}
     value.converter.schema.registry.url: {{ $.Values.schemaRegistryUrl }}
+    {{- end }}
     {{- if .maxInterval }}
     max.interval: {{ .maxInterval | quote }}
     {{- end }}

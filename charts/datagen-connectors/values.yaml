@@ -63,10 +63,9 @@ connectors:
     taskMax: 1
     topic: network-events
     keyConverter: org.apache.kafka.connect.storage.StringConverter
-    valueConverter: org.apache.kafka.connect.json.JsonConverter
+    valueConverter: io.confluent.connect.json.JsonSchemaConverter
     maxInterval: "5000"  # Slow: 1 event every 5 seconds
     iterations: "10000000"
     extraConfigs:
-      value.converter.schemas.enable: "false"
-      schema.string: '{"type":"record","name":"NetworkEvent","namespace":"io.confluent.demo","fields":[{"name":"event_time","type":"long","arg.range":{"min":1700000000000,"max":1800000000000}},{"name":"source_ip","type":"string","arg.options":["192.168.1.10","192.168.1.20","10.0.0.5","10.0.0.15","172.16.0.100"]},{"name":"dest_ip","type":"string","arg.options":["8.8.8.8","1.1.1.1","208.67.222.222","9.9.9.9","75.75.75.75"]},{"name":"protocol","type":"string","arg.options":["TCP","UDP","HTTP","HTTPS","DNS","SSH"]},{"name":"bytes_transferred","type":"long","arg.range":{"min":100,"max":1000000}}]}'
+      schema.string: '{"type":"record","name":"NetworkEvent","namespace":"io.confluent.demo","fields":[{"name":"event_time","type":{"type":"long","arg.range":{"min":1700000000000,"max":1800000000000}}},{"name":"source_ip","type":{"type":"string","arg.options":["192.168.1.10","192.168.1.20","10.0.0.5","10.0.0.15","172.16.0.100"]}},{"name":"dest_ip","type":{"type":"string","arg.options":["8.8.8.8","1.1.1.1","208.67.222.222","9.9.9.9","75.75.75.75"]}},{"name":"protocol","type":{"type":"string","arg.options":["TCP","UDP","HTTP","HTTPS","DNS","SSH"]}},{"name":"bytes_transferred","type":{"type":"long","arg.range":{"min":100,"max":1000000}}}]}'
       schema.keyfield: source_ip
