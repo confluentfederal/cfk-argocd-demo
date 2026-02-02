@@ -199,6 +199,7 @@ flink:
           cpu: 0.5
       job:
         jarURI: local:///opt/flink/usrlib/java-flink-0.0.1.jar
+        entryClass: com.example.javaflink.StreamingJob
         state: running
         parallelism: 1
         upgradeMode: stateless

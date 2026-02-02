@@ -57,6 +57,9 @@ spec:
       {{- toYaml .taskManager.resource | nindent 6 }}
   job:
     jarURI: {{ .job.jarURI }}
+    {{- if .job.entryClass }}
+    entryClass: {{ .job.entryClass }}
+    {{- end }}
     state: {{ .job.state }}
     parallelism: {{ .job.parallelism }}
     upgradeMode: {{ .job.upgradeMode | default "stateless" }}
