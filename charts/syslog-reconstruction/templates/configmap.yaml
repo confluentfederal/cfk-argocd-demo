@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "syslog-reconstruction.labels" . | nindent 4 }}
+data:
+  syslog-reconstruction.properties: |
+    # Kafka Streams Configuration
+    kafka.application.id={{ .Values.kafka.applicationId }}
+    kafka.bootstrap.servers={{ .Values.kafka.bootstrapServers }}
+    kafka.schema.registry.url={{ .Values.kafka.schemaRegistryUrl }}
+    
+    # Topic Configuration
+    kafka.input.topic={{ .Values.topics.input }}
+    kafka.output.topic.complete={{ .Values.topics.outputComplete }}
+    kafka.output.topic.partial={{ .Values.topics.outputPartial }}
+    kafka.output.topic.error={{ .Values.topics.outputError }}
+    kafka.output.topic.investigate={{ .Values.topics.outputInvestigate }}
+    kafka.output.topic.expired={{ .Values.topics.outputExpired }}
+    
+    # Window Configuration
+    window.size.seconds={{ .Values.window.sizeSeconds }}
+    window.grace.period.seconds={{ .Values.window.gracePeriodSeconds }}
+    
+    # Expired Record Handling
+    expired.record.threshold.hours={{ .Values.expired.thresholdHours }}
+    
+    # Timestamp Strategy
+    windowing.timestamp.strategy={{ .Values.windowing.timestampStrategy }}
+    
+    # Output Format
+    output.format={{ .Values.output.format }}
+    
+    # Consumer Configuration
+    consumer.auto.offset.reset={{ .Values.consumer.autoOffsetReset }}
+    consumer.max.poll.records={{ .Values.consumer.maxPollRecords }}
+    consumer.fetch.min.bytes={{ .Values.consumer.fetchMinBytes }}
+    consumer.fetch.max.wait.ms={{ .Values.consumer.fetchMaxWaitMs }}
+    consumer.max.partition.fetch.bytes={{ .Values.consumer.maxPartitionFetchBytes }}
+    
+    # Streams Configuration
+    streams.commit.interval.ms={{ .Values.streams.commitIntervalMs }}
+    streams.cache.max.bytes={{ .Values.streams.cacheMaxBytes }}
+    streams.state.cleanup.delay.ms={{ .Values.streams.stateCleanupDelayMs }}
+    streams.num.threads={{ .Values.streams.numThreads }}
+    streams.processing.guarantee={{ .Values.streams.processingGuarantee }}
+    streams.window.retention.hours={{ .Values.streams.windowRetentionHours }}
+    streams.replication.factor={{ .Values.streams.replicationFactor }}
+    
+    # Segmentation Pattern
+    segmentation.pattern={{ .Values.segmentation.pattern }}
+    
+    # ISE Header Pattern
+    ise.header.pattern={{ .Values.ise.headerPattern }}
+    
+    # Shutdown Configuration
+    shutdown.timeout.seconds={{ .Values.shutdown.timeoutSeconds }}

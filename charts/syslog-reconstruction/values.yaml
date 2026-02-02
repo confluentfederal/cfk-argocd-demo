@@ -1,0 +1,71 @@
+# Syslog Segment Reconstruction - Default values
+
+namespace: confluent
+
+replicas: 1
+
+image:
+  repository: cstevenson954/syslog-segment-reconstruction
+  tag: "1.1.14"
+  pullPolicy: IfNotPresent
+
+javaOpts: "-Xms512m -Xmx1g"
+
+resources:
+  requests:
+    memory: "1Gi"
+    cpu: "500m"
+  limits:
+    memory: "2Gi"
+    cpu: "1"
+
+kafka:
+  applicationId: segment-reconstruction
+  bootstrapServers: kafka.confluent.svc.cluster.local:9071
+  schemaRegistryUrl: http://schemaregistry.confluent.svc.cluster.local:8081
+
+topics:
+  input: segmented.keyed.messages.json
+  outputComplete: reconstruction-complete
+  outputPartial: reconstruction-partial
+  outputError: reconstruction-error
+  outputInvestigate: reconstruction-investigate
+  outputExpired: reconstruction-expired
+
+window:
+  sizeSeconds: 30
+  gracePeriodSeconds: 60
+
+expired:
+  thresholdHours: 24
+
+windowing:
+  timestampStrategy: PROCESSING_TIME
+
+output:
+  format: AVRO
+
+consumer:
+  autoOffsetReset: latest
+  maxPollRecords: 5000
+  fetchMinBytes: 1048576
+  fetchMaxWaitMs: 500
+  maxPartitionFetchBytes: 10485760
+
+streams:
+  commitIntervalMs: 5000
+  cacheMaxBytes: 104857600
+  stateCleanupDelayMs: 30000
+  numThreads: 6
+  processingGuarantee: at_least_once
+  windowRetentionHours: 6
+  replicationFactor: 3
+
+segmentation:
+  pattern: "^(\\\\d{10})\\\\s+(\\\\d+)\\\\s+(\\\\d+)\\\\s"
+
+ise:
+  headerPattern: "^\\\\d{4}-\\\\d{2}-\\\\d{2}\\\\s+\\\\d{2}:\\\\d{2}:\\\\d{2}\\\\.\\\\d{3}\\\\s+[+-]\\\\d{2}:\\\\d{2}\\\\s+\\\\d+\\\\s+\\\\d+\\\\s+(?:NOTICE|INFO|DEBUG|WARN|ERROR|ALERT|EMERG|CRIT)\\\\s+(.*)"
+
+shutdown:
+  timeoutSeconds: 30
