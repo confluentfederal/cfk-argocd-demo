@@ -114,9 +114,9 @@ ksqldb:
           status,
           COUNT(*) AS error_count
         FROM clickstream_raw
-        WHERE status LIKE '4%' OR status LIKE '5%'
         WINDOW TUMBLING (SIZE 1 MINUTE)
         GROUP BY status
+        HAVING status >= '400'
         EMIT CHANGES;
 
 # Control Center
