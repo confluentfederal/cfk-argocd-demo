@@ -1,0 +1,74 @@
+# Content Router - Syslog routing instance
+# Routes syslog messages based on severity/facility
+
+# Target namespace
+namespace: confluent
+
+# Deployment settings
+replicas: 2
+
+image:
+  repository: cstevenson954/kstream-content-router
+  tag: "1.1.1"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+# Kafka connection
+kafka:
+  bootstrapServers: kafka:9071
+
+# Schema Registry connection
+schemaRegistry:
+  url: http://schemaregistry.confluent.svc.cluster.local:8081
+
+# Topics
+inputTopics:
+  - syslog-raw
+outputTopic: syslog-parsed
+errorTopic: syslog-errors
+
+# Routing configuration
+routing:
+  inputTopicFormat: STRING
+  inputMessageField: rawMessage
+  defaultOutputTopic: syslog-other
+  removeControlCharacters: true
+  rules:
+    - regEx: ".*\\b(CRITICAL|EMERGENCY|ALERT)\\b.*"
+      outputTopic: syslog-critical
+    - regEx: ".*\\bERROR\\b.*"
+      outputTopic: syslog-errors
+    - regEx: ".*\\bWARN(ING)?\\b.*"
+      outputTopic: syslog-warnings
+    - regEx: ".*\\bINFO\\b.*"
+      outputTopic: syslog-info
+
+# Additional Kafka Streams configuration
+streamsConfig: {}
+
+# TLS configuration
+tls:
+  enabled: false
+  secretName: ""
+  mountPath: /etc/content-router-tls
+
+# Environment variables
+extraEnv: []
+
+# Additional volume mounts
+extraVolumeMounts: []
+extraVolumes: []
+
+# Resources
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1Gi"
+    cpu: "500m"
+
+# Probes
+livenessProbe: {}
+readinessProbe: {}

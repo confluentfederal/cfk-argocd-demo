@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: content-router-config
+  name: {{ .Release.Name }}-config
   namespace: {{ .Values.namespace }}
   labels:
     {{- include "content-router.labels" . | nindent 4 }}

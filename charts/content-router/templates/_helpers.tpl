@@ -13,7 +13,7 @@ app.kubernetes.io/part-of: confluent-platform
 Selector labels
 */}}
 {{- define "content-router.selectorLabels" -}}
-app: content-router
+app: {{ .Release.Name }}
 app.kubernetes.io/name: {{ .Chart.Name }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}

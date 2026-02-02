@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: content-router
+  name: {{ .Release.Name }}
   namespace: {{ .Values.namespace }}
   labels:
     {{- include "content-router.labels" . | nindent 4 }}
@@ -76,7 +76,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: content-router-config
+            name: {{ .Release.Name }}-config
         {{- if .Values.tls.enabled }}
         - name: tls-certs
           secret:

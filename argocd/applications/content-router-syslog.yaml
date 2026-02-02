@@ -1,0 +1,39 @@
+---
+# Argo CD Application for Content Router - Syslog Instance
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: content-router-syslog
+  namespace: argocd
+  labels:
+    environment: prod
+    component: kstreams
+    router-type: syslog
+spec:
+  project: confluent
+  
+  source:
+    repoURL: https://github.com/confluentfederal/cfk-argocd-demo.git
+    targetRevision: helm-migration
+    path: charts/content-router
+    helm:
+      releaseName: content-router-syslog
+      valueFiles:
+        - values-syslog.yaml
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: confluent
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
