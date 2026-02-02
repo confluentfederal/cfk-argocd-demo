@@ -1,0 +1,38 @@
+---
+# Argo CD Application for Kafka Streaming Flink Job
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: flink-kafka-streaming
+  namespace: argocd
+  labels:
+    environment: prod
+    component: flink
+spec:
+  project: confluent
+  
+  source:
+    repoURL: https://github.com/confluentfederal/cfk-argocd-demo.git
+    targetRevision: helm-migration
+    path: charts/flink-application
+    helm:
+      releaseName: kafka-streaming-job
+      valueFiles:
+        - values-kafka-streaming.yaml
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: confluent
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

@@ -1,0 +1,39 @@
+# Flink Application - Kafka Streaming Job
+# Custom Java Flink app for Kafka stream processing
+
+namespace: confluent
+
+flinkEnvironment: flink-env
+
+image:
+  repository: cstevenson954/java-flink
+  tag: "0.0.1"
+
+flinkVersion: v1_20
+
+serviceAccount: flink
+
+flinkConfiguration:
+  taskmanager.numberOfTaskSlots: "2"
+
+# Reduced resources to fit cluster capacity
+jobManager:
+  resource:
+    memory: "1024m"
+    cpu: "0.5"
+
+taskManager:
+  resource:
+    memory: "1024m"
+    cpu: "0.5"
+
+job:
+  jarURI: local:///opt/flink/usrlib/java-flink-0.0.1.jar
+  entryClass: com.example.javaflink.StreamingJob
+  state: running
+  parallelism: 1
+  upgradeMode: stateless
+  args:
+    - "--bootstrap.servers=kafka.confluent.svc.cluster.local:9071"
+    - "--input.topic=flink-input"
+    - "--output.topic=flink-output"
