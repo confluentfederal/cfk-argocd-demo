@@ -13,7 +13,7 @@ spec:
   project: confluent
   
   source:
-    repoURL: https://github.com/confluentfederal/cfk-argocd-demo.git
+    repoURL: https://github.com/confluentfederal/demo-cfk-argocd.git
     targetRevision: helm-migration
     path: charts/syslog-reconstruction
     helm:

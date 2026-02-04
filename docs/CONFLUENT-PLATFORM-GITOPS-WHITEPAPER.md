@@ -84,7 +84,7 @@ This white paper documents a production-ready GitOps implementation for Confluen
 ### Repository Structure
 
 ```
-cfk-argocd-demo/
+demo-cfk-argocd/
 ├── argocd/
 │   ├── applications/                    # ArgoCD Application manifests
 │   │   ├── confluent-platform-prod.yaml
@@ -242,13 +242,13 @@ kubectl apply -f - <<EOF
 apiVersion: v1
 kind: Secret
 metadata:
-  name: repo-cfk-argocd-demo
+  name: repo-demo-cfk-argocd
   namespace: argocd
   labels:
     argocd.argoproj.io/secret-type: repository
 stringData:
   type: git
-  url: https://github.com/confluentfederal/cfk-argocd-demo.git
+  url: https://github.com/confluentfederal/demo-cfk-argocd.git
   username: <github-username>
   password: <github-pat>
 EOF
@@ -266,7 +266,7 @@ metadata:
 spec:
   description: Confluent Platform GitOps Project
   sourceRepos:
-    - https://github.com/confluentfederal/cfk-argocd-demo.git
+    - https://github.com/confluentfederal/demo-cfk-argocd.git
   destinations:
     - namespace: confluent
       server: https://kubernetes.default.svc
@@ -314,7 +314,7 @@ metadata:
 spec:
   project: confluent
   source:
-    repoURL: https://github.com/confluentfederal/cfk-argocd-demo.git
+    repoURL: https://github.com/confluentfederal/demo-cfk-argocd.git
     targetRevision: main
     path: charts/<chart-name>
     helm:
@@ -361,7 +361,7 @@ metadata:
 spec:
   project: confluent
   source:
-    repoURL: https://github.com/confluentfederal/cfk-argocd-demo.git
+    repoURL: https://github.com/confluentfederal/demo-cfk-argocd.git
     targetRevision: helm-migration
     path: charts/confluent-platform
     helm:
@@ -425,7 +425,7 @@ metadata:
 spec:
   project: confluent
   source:
-    repoURL: https://github.com/confluentfederal/cfk-argocd-demo.git
+    repoURL: https://github.com/confluentfederal/demo-cfk-argocd.git
     targetRevision: helm-migration
     path: charts/content-router
     helm:
@@ -1014,7 +1014,7 @@ This GitOps implementation provides:
 
 ## Resources
 
-- **Repository:** https://github.com/confluentfederal/cfk-argocd-demo
+- **Repository:** https://github.com/confluentfederal/demo-cfk-argocd
 - **CFK Documentation:** https://docs.confluent.io/operator/current/overview.html
 - **ArgoCD Documentation:** https://argo-cd.readthedocs.io/
 - **Flink on Confluent:** https://docs.confluent.io/platform/current/flink/overview.html

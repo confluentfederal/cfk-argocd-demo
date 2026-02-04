@@ -11,7 +11,7 @@ spec:
   project: confluent
   
   source:
-    repoURL: https://github.com/confluentfederal/cfk-argocd-demo.git
+    repoURL: https://github.com/confluentfederal/demo-cfk-argocd.git
     targetRevision: helm-migration  # Change to main after merge
     path: charts/confluent-platform
     helm:

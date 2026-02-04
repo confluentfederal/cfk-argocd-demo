@@ -11,7 +11,7 @@
 
 3. **Configure Connection**
    - Choose **VIA HTTPS**
-   - **Repository URL:** `https://github.com/confluentfederal/cfk-argocd-demo.git`
+   - **Repository URL:** `https://github.com/confluentfederal/demo-cfk-argocd.git`
    - **Username:** Your GitHub username
    - **Password:** GitHub Personal Access Token
 

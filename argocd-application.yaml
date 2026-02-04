@@ -10,7 +10,7 @@ spec:
   project: default
   
   source:
-    repoURL: https://github.com/confluentfederal/cfk-argocd-demo.git
+    repoURL: https://github.com/confluentfederal/demo-cfk-argocd.git
     targetRevision: HEAD
     path: overlays/prod
   

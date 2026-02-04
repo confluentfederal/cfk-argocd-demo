@@ -19,7 +19,7 @@ Just for testing.
 ## Project Structure
 
 ```
-cfk-argocd-demo/
+demo-cfk-argocd/
 ├── argocd/
 │   ├── project.yaml                         # ArgoCD AppProject
 │   └── applications/
